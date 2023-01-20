@@ -1,55 +1,4 @@
 const tf = require("@tensorflow/tfjs");
-const trainingData = [
-  { input: [0, 0], label: [0] },
-  { input: [0, 1], label: [1] },
-  { input: [1, 0], label: [1] },
-  { input: [1, 1], label: [0] },
-];
-const testData = [
-  [0, 0],
-  [0, 1],
-  [1, 0],
-  [1, 1],
-  [0.5, 0.5],
-  [0.1, 0.9],
-  [Math.random(), Math.random()],
-  [Math.random(), Math.random()],
-  [Math.random(), Math.random()],
-  [Math.random(), Math.random()],
-];
-
-async function run() {
-  console.log("XOR-AI started");
-
-  const model = createModel();
-  console.log("Done Model Generation");
-
-  const start = new Date();
-  const tensorData = convertToTensor(trainingData);
-  const { inputs, labels } = tensorData;
-  await trainModel(model, inputs, labels);
-  console.log(
-    "Done Training in " + (new Date().getTime() - start.getTime()) + " ms"
-  );
-
-  const [normInputs, normPredictions] = await testModel(
-    model,
-    testData,
-    tensorData
-  );
-
-  for (let i = 0; i < normPredictions.length; i++) {
-    let in1 = i * 2;
-    let in2 = in1 + 1;
-    console.log(
-      normInputs[in1].toFixed(2) +
-        " " +
-        normInputs[in2].toFixed(2) +
-        " => " +
-        normPredictions[i].toFixed(2)
-    );
-  }
-}
 
 function createModel() {
   const model = tf.sequential();
@@ -109,7 +58,7 @@ async function trainModel(model, inputs, labels) {
     loss: tf.losses.meanSquaredError,
     metrics: ["mse"],
   });
-  const epochs = 2000;
+  const epochs = 3000;
   return await model.fit(inputs, labels, {
     epochs,
     shuffle: true,
@@ -130,4 +79,4 @@ async function testModel(model, inputData, normalizationData) {
   return [inputs, predictions];
 }
 
-run();
+module.exports = { createModel, convertToTensor, trainModel, testModel };
